@@ -1,7 +1,7 @@
 {
-  "name": "Duration Calculator",
-  "short_name": "Duration",
-  "description": "Calculate piece length, measures and tempo",
+  "name": "MusiCalculator",
+  "short_name": "Musicalc",
+  "description": "Duration, measures and tempo calculator for composers",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
