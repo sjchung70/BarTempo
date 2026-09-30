@@ -1,249 +1,252 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>작품 길이 계산기</title>
+<title>Duration Calculator</title>
 <style>
 :root{--bg:#f6f5f1;--card:#fff;--tx:#1d1d1b;--mut:#6b6a66;--ac:#2f5d8a;--acbg:#e6eef6;--bd:#d9d7d0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1a19;--card:#242422;--tx:#eeede8;--mut:#a09f99;--ac:#8fb8e3;--acbg:#26364a;--bd:#3a3a37}}
 :root[data-theme="dark"]{--bg:#1a1a19;--card:#242422;--tx:#eeede8;--mut:#a09f99;--ac:#8fb8e3;--acbg:#26364a;--bd:#3a3a37}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.5}
-main{max-width:520px;margin:0 auto;padding:20px 16px 40px}
-h1{font-size:20px;margin:0 0 4px}
-p.sub{margin:0 0 16px;color:var(--mut);font-size:14px}
+main{max-width:520px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:20px;margin:0 0 12px}
+p.sub{margin:0 0 14px;color:var(--mut);font-size:14px}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
 .modes{display:flex;gap:6px}
 .modes button{flex:1;padding:10px 4px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;font-size:14px;cursor:pointer}
 .modes button.on{background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 label{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
-input,select{width:100%;box-sizing:border-box;padding:10px;font-size:16px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)}
+input,select,textarea{width:100%;box-sizing:border-box;padding:10px;font-size:16px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)}
+textarea{font-size:13px;font-family:ui-monospace,monospace;margin-bottom:6px}
 input[readonly]{background:var(--acbg);border-color:var(--ac);font-weight:700;color:var(--ac)}
 .ts{display:flex;align-items:center;gap:6px}.ts span{font-size:20px}
 .full{grid-column:1/-1}
-#res{font-size:15px}#res b{font-size:22px;color:var(--ac)}
-#res div{margin-top:6px;color:var(--mut);font-size:14px}
-#res .err,.o.err{color:#c0392b}
-.rh{display:flex;gap:8px}.del{border:1px solid var(--bd);background:var(--card);color:var(--mut);border-radius:8px;width:44px;font-size:16px;cursor:pointer}
-.btn{width:100%;padding:12px;border:1px dashed var(--ac);background:none;color:var(--ac);border-radius:8px;font-size:15px;cursor:pointer;margin-bottom:14px}
-.o{font-size:14px;color:var(--mut)}
-.btns{display:flex;gap:8px}.btns .btn{margin-bottom:8px;flex:1}.solid{background:var(--ac);color:var(--bg);border-style:solid;font-weight:600}
-.rh input,.rh select{flex:1;min-width:0;width:auto}
-textarea{width:100%;box-sizing:border-box;padding:10px;font-size:13px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-family:ui-monospace,monospace;margin-bottom:6px}
-#tot b{font-size:22px;color:var(--ac)}#tot div{margin-top:6px;color:var(--mut);font-size:14px}
+#res,#tot{font-size:15px}#res b,#tot b{font-size:22px;color:var(--ac)}
+#res div,#tot div{margin-top:6px;color:var(--mut);font-size:14px}
+.err{color:#c0392b}
+.rh{display:flex;gap:8px}.rh input,.rh select{flex:1;min-width:0;width:auto}
+.del{border:1px solid var(--bd);background:var(--card);color:var(--mut);border-radius:8px;min-width:44px;font-size:14px;cursor:pointer;padding:6px}
+.btn{width:100%;padding:12px;border:1px dashed var(--ac);background:none;color:var(--ac);border-radius:8px;font-size:15px;cursor:pointer;margin-bottom:8px}
+.btns{display:flex;gap:8px}.btns .btn{flex:1}
+.solid{background:var(--ac);color:var(--bg);border-style:solid;font-weight:600}
+.o{font-size:14px;color:var(--mut);margin-bottom:8px}
+small{font-size:11px;font-weight:400;opacity:.85}
+#lang{display:flex;gap:6px;justify-content:flex-end;margin-bottom:8px}
+#lang button{padding:5px 11px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:14px;font-size:12px;cursor:pointer}
+#lang button.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
 </style>
 </head>
 <body>
 <main>
-<h1>작품 길이 계산기</h1>
-<div class="card modes" id="tabs"><button data-t="single" class="on">단일 구간</button><button data-t="multi">다구간 (템포·박자 변화)</button></div>
+<div id="lang"><button data-l="en">English</button><button data-l="ko">한국어</button><button data-l="both">EN + 한</button></div>
+<h1 data-t="title"></h1>
+
+<div class="card modes" id="tabs"><button class="on bk" data-tab="single" data-t="tabS"></button><button class="bk" data-tab="multi" data-t="tabM"></button></div>
+
 <div id="single">
-<p class="sub">구하고 싶은 값을 고르고, 나머지 값을 입력하세요.</p>
-
-<div class="card modes" id="modes">
-  <button data-m="time" class="on">시간 구하기</button>
-  <button data-m="meas">마디 수 구하기</button>
-  <button data-m="bpm">bpm 구하기</button>
-</div>
-
+<p class="sub" data-t="subS"></p>
+<label data-t="lCalc" style="margin:0 2px 4px;font-weight:700;color:var(--tx)"></label>
+<div class="card modes" id="modes"><button data-m="time" class="on bk" data-t="mT"></button><button data-m="meas" class="bk" data-t="mM"></button><button data-m="bpm" class="bk" data-t="mB"></button></div>
 <div class="card grid">
-  <div><label>박자 (분자/분모)</label>
-    <div class="ts"><input id="num" type="number" min="1" max="32" value="4" inputmode="numeric"><span>/</span>
-    <select id="den"><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div></div>
-  <div><label>bpm 기준 음표</label>
-    <select id="unit"><option value="0.5">2분음표 ♩♩</option><option value="0.25" selected>4분음표 ♩</option><option value="0.375">점4분음표 ♩.</option><option value="0.125">8분음표 ♪</option></select></div>
-  <div><label>빠르기 (bpm)</label><div class="rh"><input id="bpm" type="number" min="1" step="any" value="120" inputmode="decimal"><button class="del tap" id="tap1" style="width:84px;font-size:13px" title="박자에 맞춰 여러 번 클릭하세요">탭 템포</button></div></div>
-  <div><label>마디 수</label><input id="meas" type="number" min="0" step="any" value="32" inputmode="decimal"></div>
-  <div class="full"><label>연주 시간 (분:초 또는 초)</label><input id="time" type="text" value="1:00" inputmode="text"></div>
+  <div><label data-t="lTs"></label><div class="ts"><input id="num" type="number" min="1" max="32" value="4" inputmode="numeric"><span>/</span><select id="den"><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div></div>
+  <div><label data-t="lUnit"></label><select id="unit" class="u"></select></div>
+  <div><label data-t="lBpm"></label><div class="rh"><input id="bpm" type="number" min="1" step="any" value="120" inputmode="decimal"><button id="tap1" class="del bk" style="width:84px" data-t="tap"></button></div></div>
+  <div><label data-t="lMeas"></label><input id="meas" type="number" min="0" step="any" value="32" inputmode="decimal"></div>
+  <div class="full"><label data-t="lTime"></label><input id="time" type="text" value="1:00"></div>
 </div>
-
 <div class="card" id="res"></div>
-<div class="btns"><button id="p1" class="btn solid">▶ 메트로놈 재생</button><button id="sh1" class="btn">결과 공유</button></div>
+<div class="btns"><button id="p1" class="btn solid bk" data-t="play"></button><button id="sh1" class="btn bk" data-t="share"></button></div>
 <div class="o" id="s1"></div>
 </div>
+
 <div id="multi" hidden>
-<p class="sub">구간마다 박자·빠르기·마디 수를 입력하면 전체 길이를 합산합니다.</p>
+<p class="sub" data-t="subM"></p>
 <div id="rows"></div>
-<button id="add" class="btn">+ 구간 추가</button>
-<div class="btns"><button id="p2" class="btn solid">▶ 전체 재생 (메트로놈)</button></div>
-<div class="o" id="s2" style="margin:-6px 0 14px"></div>
-<div class="card"><label>목표 시간 (선택, 분:초 또는 초)</label><input id="tt" type="text" placeholder="예: 3:30"><div id="tot" style="margin-top:10px"></div></div>
-<div class="card"><label>구간 저장 / 불러오기 (이 기기의 브라우저에 저장)</label>
-<div class="rh"><input id="pn" placeholder="작품 이름"><button id="sv" class="del" style="width:64px">저장</button></div>
-<div class="rh" style="margin-top:8px"><select id="pl"></select><button id="ld" class="del" style="width:76px">불러오기</button><button id="rm" class="del">삭제</button></div></div>
-<div class="card"><label>공유</label>
-<div class="btns"><button id="sh2" class="btn">결과 공유</button><button id="ex" class="btn">코드 내보내기</button><button id="im" class="btn">코드 가져오기</button></div>
-<textarea id="code" rows="3" placeholder="내보낸 코드가 여기에 표시됩니다. 다른 기기에서 불러오려면 코드를 붙여넣고 '코드 가져오기'를 누르세요."></textarea>
-<div class="o" id="msg"></div></div>
+<button id="add" class="btn" data-t="add"></button>
+<div class="btns"><button id="p2" class="btn solid bk" data-t="playAll"></button></div>
+<div class="o" id="s2"></div>
+<div class="card"><label data-t="lTarget"></label><input id="tt" type="text" data-p="pTarget"><div id="tot" style="margin-top:10px"></div></div>
+<div class="card"><label data-t="lSave"></label>
+<div class="rh"><input id="pn" data-p="pTitle"><button id="sv" class="del bk" data-t="save"></button></div>
+<div class="rh" style="margin-top:8px"><select id="pl"></select><button id="ld" class="del bk" data-t="load"></button><button id="rm" class="del bk" data-t="del"></button></div></div>
+<div class="card"><label data-t="lShare"></label>
+<div class="btns"><button id="sh2" class="btn bk" data-t="share"></button><button id="ex" class="btn bk" data-t="exp"></button><button id="im" class="btn bk" data-t="imp"></button></div>
+<textarea id="code" rows="3" data-p="pCode"></textarea><div class="o" id="msg"></div></div>
 </div>
 </main>
 <script>
 const $=id=>document.getElementById(id);
-let mode='time';
-function parseT(s){s=s.trim();if(!s)return NaN;if(s.includes(':')){const p=s.split(':');return (parseFloat(p[0])||0)*60+(parseFloat(p[1])||0)}return parseFloat(s)}
-function fmt(sec){const t=Math.round(sec*10),m=Math.floor(t/600),s=(t%600)/10;return m+':'+s.toFixed(1).padStart(4,'0')}
+const D={
+title:['작품 길이 계산기','Duration Calculator'],tabS:['단일 구간','Single section'],tabM:['다구간 (템포·박자 변화)','Multi-section (tempo / meter changes)'],
+lCalc:['계산할 값','Calculate'],mT:['시간','Duration'],mM:['마디 수','Measures'],mB:['bpm','bpm'],
+subS:['구하고 싶은 값을 고르고, 나머지 값을 입력하세요.','Choose what to find, then fill in the other values.'],
+subM:['구간마다 박자·빠르기·마디 수를 입력하면 전체 길이를 합산합니다.','Enter time signature, tempo and measures for each section to get the total length.'],
+lTs:['박자 (분자/분모)','Time signature'],lUnit:['bpm 기준 음표','Beat unit'],lBpm:['빠르기 (bpm)','Tempo (bpm)'],lMeas:['마디 수','Measures'],lTime:['연주 시간 (분:초 또는 초)','Duration (mm:ss or sec)'],
+u2:['2분음표','Half note'],u4:['4분음표','Quarter note'],u4d:['점4분음표','Dotted quarter'],u8:['8분음표','Eighth note'],
+tap:['탭 템포','Tap tempo'],tapping:['탭…','Tap…'],play:['▶ 메트로놈 재생','▶ Play metronome'],playAll:['▶ 전체 재생 (메트로놈)','▶ Play all with metronome'],stop:['■ 정지','■ Stop'],
+share:['결과 공유','Share result'],add:['+ 구간 추가','+ Add section'],lTarget:['목표 시간 (선택)','Target duration (optional)'],
+lSave:['구간 저장 / 불러오기 (이 브라우저에 저장)','Save / load sections (stored in this browser)'],save:['저장','Save'],load:['불러오기','Load'],del:['삭제','Delete'],
+lShare:['공유','Share'],exp:['코드 내보내기','Export code'],imp:['코드 가져오기','Import code'],
+secName:['구간 이름 (선택)','Section name (optional)'],pTitle:['작품 이름','Piece title'],pTarget:['예: 3:30','e.g. 3:30'],
+pCode:['내보낸 코드가 여기에 표시됩니다. 다른 기기에서는 붙여넣고 "코드 가져오기"를 누르세요.','Exported code appears here. On another device, paste it and press "Import code".'],
+noSaved:['저장된 작품 없음','No saved pieces'],
+rDur:['연주 시간','Duration'],rBar:['한 마디','One measure'],s:['초','s'],ms:['마디','measures'],rNeed:['필요한 마디 수','Measures needed'],
+exact:['정확히 떨어집니다.','Fits exactly.'],up:['올림','Round up'],down:['내림','Round down'],rTempo:['필요한 빠르기','Required tempo'],
+eTs:['박자를 확인하세요.','Check the time signature.'],eBM:['bpm과 마디 수를 입력하세요.','Enter bpm and measures.'],eBT:['bpm과 시간을 입력하세요.','Enter bpm and duration.'],
+eMT:['마디 수와 시간을 입력하세요.','Enter measures and duration.'],eChk:['입력 값을 확인하세요.','Check the input values.'],eVal:['값을 확인하세요','Check values'],
+len:['길이','Length'],start:['시작','Start'],bars:['마디','Bars'],tot:['총 길이','Total'],nSec:['구간','sections'],targ:['목표','Target'],over:['김','over'],under:['짧음','under'],match:['거의 일치','Match'],
+playing:['재생 중','Playing'],secL:['구간','Section'],barL:['마디','Bar'],eTB:['박자와 bpm을 확인하세요.','Check time signature and bpm.'],
+nName:['작품 이름을 입력하세요.','Enter a piece title.'],nSec0:['저장할 구간이 없어요.','No sections to save.'],saved:['저장했어요.','Saved.'],
+noStore:['이 환경에서는 저장할 수 없어요. 코드 내보내기를 이용하세요.','Storage is unavailable here. Use Export code.'],pick:['불러올 작품을 선택하세요.','Select a piece to load.'],
+loaded:['불러왔어요.','Loaded.'],deleted:['삭제했어요.','Deleted.'],copied:['복사했어요.','Copied.'],manual:['아래 상자의 내용을 직접 복사하세요.','Copy the text in the box below.'],
+imported:['가져왔어요.','Imported.'],badCode:['코드를 확인하세요.','Check the code.'],hdr:['[작품 길이 계산]','[Duration Calculator]']};
+const UK=[[0.5,'u2'],[0.25,'u4'],[0.375,'u4d'],[0.125,'u8']],UN={0.5:'u2',0.25:'u4',0.375:'u4d',0.125:'u8'};
+let lang='en',mode='time';try{lang=localStorage.getItem('lc.lang')||'en'}catch(e){}
+const t=k=>{const d=D[k];return lang==='ko'?d[0]:lang==='en'?d[1]:d[0]+' / '+d[1]};
+const tf=(k,bk)=>{const d=D[k];return lang==='ko'?d[0]:lang==='en'?d[1]:bk?d[0]+'<br><small>'+d[1]+'</small>':d[0]+' · '+d[1]};
+function applyLang(r){r=r||document;
+  r.querySelectorAll('[data-t]').forEach(e=>e.innerHTML=tf(e.dataset.t,e.classList.contains('bk')));
+  r.querySelectorAll('[data-p]').forEach(e=>e.placeholder=t(e.dataset.p));
+  r.querySelectorAll('select.u').forEach(x=>{const v=x.value||'0.25';x.innerHTML=UK.map(u=>'<option value="'+u[0]+'">'+t(u[1])+'</option>').join('');x.value=v})}
+const parseT=s=>{s=s.trim();if(!s)return NaN;if(s.includes(':')){const p=s.split(':');return(parseFloat(p[0])||0)*60+(parseFloat(p[1])||0)}return parseFloat(s)};
+const fmt=sec=>{const x=Math.round(sec*10),m=Math.floor(x/600),s=(x%600)/10;return m+':'+s.toFixed(1).padStart(4,'0')};
+const sug=(n,d)=>(d===8&&n%3===0&&n>=6)?'0.375':(d===2?'0.5':(d>=8?'0.125':'0.25'));
+
+// ---- single ----
 function calc(){
-  const num=+$('num').value,den=+$('den').value,unit=+$('unit').value;
-  const bpm=+$('bpm').value,meas=+$('meas').value,time=parseT($('time').value);
-  const bar=num/den/unit; // 한 마디 = bpm 기준 음표 몇 개
+  const num=+$('num').value,den=+$('den').value,unit=+$('unit').value,bpm=+$('bpm').value,meas=+$('meas').value,time=parseT($('time').value);
+  const bar=num/den/unit,bs=b=>60/b*bar,R=$('res'),bad=k=>{R.innerHTML='<span class="err">'+t(k)+'</span>'};
   ['time','meas','bpm'].forEach(k=>$(k).readOnly=(k===mode));
-  const R=$('res');
-  const bad=t=>{R.innerHTML='<span class="err">'+t+'</span>'};
-  if(!(num>0)) return bad('박자를 확인하세요.');
-  const barSec=b=>60/b*bar;
+  if(!(num>0))return bad('eTs');
   if(mode==='time'){
-    if(!(bpm>0)||!(meas>=0)) return bad('bpm과 마디 수를 입력하세요.');
-    const t=meas*barSec(bpm);
-    $('time').value=fmt(t);
-    R.innerHTML='연주 시간 <b>'+fmt(t)+'</b> ('+t.toFixed(2)+'초)<div>한 마디 = '+barSec(bpm).toFixed(3)+'초</div>';
+    if(!(bpm>0)||!(meas>=0))return bad('eBM');
+    const x=meas*bs(bpm);$('time').value=fmt(x);
+    R.innerHTML=t('rDur')+' <b>'+fmt(x)+'</b> ('+x.toFixed(2)+t('s')+')<div>'+t('rBar')+' = '+bs(bpm).toFixed(3)+t('s')+'</div>';
   }else if(mode==='meas'){
-    if(!(bpm>0)||!(time>0)) return bad('bpm과 시간을 입력하세요.');
-    const bs=barSec(bpm),x=time/bs,lo=Math.floor(x),hi=Math.ceil(x);
-    $('meas').value=+x.toFixed(2);
-    let h='필요한 마디 수 <b>'+x.toFixed(2)+'마디</b><div>한 마디 = '+bs.toFixed(3)+'초</div>';
-    if(lo===hi) h+='<div>정확히 떨어집니다.</div>';
-    else h+='<div>올림 '+hi+'마디 → '+fmt(hi*bs)+' (목표보다 +'+(hi*bs-time).toFixed(1)+'초)</div><div>내림 '+lo+'마디 → '+fmt(lo*bs)+' (목표보다 −'+(time-lo*bs).toFixed(1)+'초)</div>';
+    if(!(bpm>0)||!(time>0))return bad('eBT');
+    const b1=bs(bpm),x=time/b1,lo=Math.floor(x),hi=Math.ceil(x);$('meas').value=+x.toFixed(2);
+    let h=t('rNeed')+' <b>'+x.toFixed(2)+' '+t('ms')+'</b><div>'+t('rBar')+' = '+b1.toFixed(3)+t('s')+'</div>';
+    h+=lo===hi?'<div>'+t('exact')+'</div>':'<div>'+t('up')+' '+hi+' '+t('ms')+' → '+fmt(hi*b1)+' (+'+(hi*b1-time).toFixed(1)+t('s')+')</div><div>'+t('down')+' '+lo+' '+t('ms')+' → '+fmt(lo*b1)+' (−'+(time-lo*b1).toFixed(1)+t('s')+')</div>';
     R.innerHTML=h;
   }else{
-    if(!(meas>0)||!(time>0)) return bad('마디 수와 시간을 입력하세요.');
-    const b=60*meas*bar/time;
-    $('bpm').value=+b.toFixed(2);
-    R.innerHTML='필요한 빠르기 <b>♩ = '+b.toFixed(1)+'</b><div>한 마디 = '+(time/meas).toFixed(3)+'초</div>';
+    if(!(meas>0)||!(time>0))return bad('eMT');
+    const b=60*meas*bar/time;$('bpm').value=+b.toFixed(2);
+    R.innerHTML=t('rTempo')+' <b>'+b.toFixed(1)+' bpm</b><div>'+t('rBar')+' = '+(time/meas).toFixed(3)+t('s')+'</div>';
   }
 }
 document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('#modes button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');mode=b.dataset.m;calc();
-});
-// 박자를 바꾸면 bpm 기준 음표를 자동 제안 (수동 변경 가능)
-function suggest(){const n=+$('num').value,d=+$('den').value;
-  $('unit').value=(d===8&&n%3===0&&n>=6)?'0.375':(d===2?'0.5':(d===16?'0.125':(d===8?'0.125':'0.25')));calc()}
+  document.querySelectorAll('#modes button').forEach(x=>x.classList.remove('on'));b.classList.add('on');mode=b.dataset.m;calc()});
+const suggest=()=>{$('unit').value=sug(+$('num').value,+$('den').value);calc()};
 $('num').oninput=suggest;$('den').onchange=suggest;
 ['unit','bpm','meas','time'].forEach(id=>$(id).addEventListener('input',calc));
-calc();
 
-// ---- 다구간 ----
+// ---- multi ----
 const rows=$('rows');
-const UN='<option value="0.5">2분음표</option><option value="0.25">4분음표</option><option value="0.375">점4분음표</option><option value="0.125">8분음표</option>';
-const sug=(n,d)=>(d===8&&n%3===0&&n>=6)?'0.375':(d===2?'0.5':(d>=8?'0.125':'0.25'));
 function addRow(v){
-  const p=rows.lastElementChild,g=(r,c,def)=>r?r.querySelector(c).value:def;
+  const p=rows.lastElementChild,g=(c,def)=>p?p.querySelector(c).value:def;
   const d=document.createElement('div');d.className='card grid';
-  d.innerHTML='<div class="full rh"><input class="nm" placeholder="구간 이름 (선택)"><button class="del" title="구간 삭제">✕</button></div>'
-  +'<div><label>박자</label><div class="ts"><input class="n" type="number" min="1" inputmode="numeric"><span>/</span><select class="d"><option>2</option><option>4</option><option>8</option><option>16</option></select></div></div>'
-  +'<div><label>bpm 기준 음표</label><select class="u">'+UN+'</select></div>'
-  +'<div><label>빠르기 (bpm)</label><div class="rh"><input class="b" type="number" min="1" step="any" inputmode="decimal"><button class="del tap" style="width:84px;font-size:13px" title="박자에 맞춰 여러 번 클릭하세요">탭</button></div></div>'
-  +'<div><label>마디 수</label><input class="m" type="number" min="0" step="any" inputmode="decimal"></div>'
-  +'<div class="full o"></div>';
-  const q=c=>d.querySelector(c);
+  d.innerHTML='<div class="full rh"><input class="nm" data-p="secName"><button class="del x">✕</button></div>'
+  +'<div><label data-t="lTs"></label><div class="ts"><input class="n" type="number" min="1" inputmode="numeric"><span>/</span><select class="d"><option>2</option><option>4</option><option>8</option><option>16</option></select></div></div>'
+  +'<div><label data-t="lUnit"></label><select class="u"></select></div>'
+  +'<div><label data-t="lBpm"></label><div class="rh"><input class="b" type="number" min="1" step="any" inputmode="decimal"><button class="del tap bk" style="width:84px" data-t="tap"></button></div></div>'
+  +'<div><label data-t="lMeas"></label><input class="m" type="number" min="0" step="any" inputmode="decimal"></div><div class="full o"></div>';
+  const q=c=>d.querySelector(c);applyLang(d);
   if(v&&v.n){q('.nm').value=v.nm||'';q('.n').value=v.n;q('.d').value=v.d;q('.u').value=v.u;q('.b').value=v.b;q('.m').value=v.m}
-  else{q('.n').value=g(p,'.n',4);q('.d').value=g(p,'.d',4);q('.u').value=g(p,'.u',0.25);q('.b').value=g(p,'.b',120);q('.m').value=8}
-  d.addEventListener('input',e=>{
-    if(e.target.matches('.n,.d'))d.querySelector('.u').value=sug(+d.querySelector('.n').value,+d.querySelector('.d').value);
-    calcMulti();
-  });
+  else{q('.n').value=g('.n',4);q('.d').value=g('.d',4);q('.u').value=g('.u',0.25);q('.b').value=g('.b',120);q('.m').value=8}
+  d.addEventListener('input',e=>{if(e.target.matches('.n,.d'))q('.u').value=sug(+q('.n').value,+q('.d').value);calcMulti()});
   makeTapper(q('.tap'),b=>{q('.b').value=b;calcMulti()});
-  d.querySelector('.del').onclick=()=>{if(rows.children.length>1){d.remove();calcMulti()}};
+  q('.x').onclick=()=>{if(rows.children.length>1){d.remove();calcMulti()}};
   rows.appendChild(d);calcMulti();
 }
 function calcMulti(){
-  let t=0,m=0,ok=true;
-  [...rows.children].forEach(r=>{
-    const q=s=>r.querySelector(s),o=q('.o');
+  let T=0,M=0,ok=true;
+  [...rows.children].forEach(r=>{const q=c=>r.querySelector(c),o=q('.o');
     const n=+q('.n').value,d=+q('.d').value,u=+q('.u').value,b=+q('.b').value,ms=+q('.m').value;
-    if(!(n>0&&b>0&&ms>=0)){o.textContent='값을 확인하세요';o.classList.add('err');ok=false;return}
-    o.classList.remove('err');
-    const sec=ms*60/b*(n/d/u);
-    o.textContent='길이 '+fmt(sec)+' · 시작 '+fmt(t)+(ms>0?' · 마디 '+(m+1)+'–'+(m+ms):'');
-    t+=sec;m+=ms;
-  });
-  let h='총 길이 <b>'+fmt(t)+'</b> ('+t.toFixed(1)+'초)<div>총 '+(+m.toFixed(2))+'마디, '+rows.children.length+'개 구간</div>';
+    if(!(n>0&&b>0&&ms>=0)){o.textContent=t('eVal');o.classList.add('err');ok=false;return}
+    o.classList.remove('err');const sec=ms*60/b*(n/d/u);
+    o.textContent=t('len')+' '+fmt(sec)+' · '+t('start')+' '+fmt(T)+(ms>0?' · '+t('bars')+' '+(M+1)+'–'+(M+ms):'');T+=sec;M+=ms});
+  let h=t('tot')+' <b>'+fmt(T)+'</b> ('+T.toFixed(1)+t('s')+')<div>'+(+M.toFixed(2))+' '+t('ms')+', '+rows.children.length+' '+t('nSec')+'</div>';
   const tg=parseT($('tt').value);
-  if(tg>0){const df=t-tg;h+='<div>목표 '+fmt(tg)+' 대비 '+(Math.abs(df)<0.05?'거의 일치':(df>0?'+':'−')+Math.abs(df).toFixed(1)+'초 '+(df>0?'김':'짧음'))+'</div>'}
-  $('tot').innerHTML=ok?h:'<span class="err">입력 값을 확인하세요.</span>';
+  if(tg>0){const df=T-tg;h+='<div>'+t('targ')+' '+fmt(tg)+': '+(Math.abs(df)<0.05?t('match'):(df>0?'+':'−')+Math.abs(df).toFixed(1)+t('s')+' '+t(df>0?'over':'under'))+'</div>'}
+  $('tot').innerHTML=ok?h:'<span class="err">'+t('eChk')+'</span>';
 }
 $('add').onclick=addRow;$('tt').addEventListener('input',calcMulti);
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');$('single').hidden=b.dataset.t!=='single';$('multi').hidden=b.dataset.t!=='multi';
-});
-addRow();addRow();
+  document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  $('single').hidden=b.dataset.tab!=='single';$('multi').hidden=b.dataset.tab!=='multi';stopPlay()});
+const getSecs=()=>[...rows.children].map(r=>{const q=c=>r.querySelector(c);
+  const o={nm:q('.nm').value.trim(),n:+q('.n').value,d:+q('.d').value,u:+q('.u').value,b:+q('.b').value,m:+q('.m').value};
+  o.sec=o.m*60/o.b*(o.n/o.d/o.u);return o}).filter(o=>o.n>0&&o.b>0&&o.m>=0);
 
-// ---- 메트로놈 ----
+// ---- tap tempo (whole bpm) ----
+function makeTapper(btn,fn){let T=[],to=null;
+  btn.addEventListener('pointerdown',e=>{e.preventDefault();const now=performance.now();
+    if(T.length&&now-T[T.length-1]>2500)T=[];T.push(now);if(T.length>8)T.shift();
+    clearTimeout(to);to=setTimeout(()=>{T=[];btn.innerHTML=tf('tap',1)},2500);
+    if(T.length<2){btn.textContent=t('tapping');return}
+    const b=Math.round(60000*(T.length-1)/(T[T.length-1]-T[0]));btn.textContent=b+' bpm';fn(b)})}
+makeTapper($('tap1'),b=>{if(mode==='bpm')document.querySelector('#modes button[data-m="time"]').click();$('bpm').value=b;calc()});
+
+// ---- metronome ----
 let AC=null,tm=null,evs=[],ei=0,ui=0,t0=0,playing=null,cur=null;
-function build(S){evs=[];let t=0,mn=0;
+function build(S){evs=[];let T=0,mn=0;
   S.forEach((s,i)=>{const beat=60/s.b,bar=s.n/s.d/s.u,bs=beat*bar,nb=Math.ceil(bar-1e-9),M=Math.max(1,Math.round(s.m));
-    for(let k=0;k<M;k++){mn++;for(let j=0;j<nb;j++)evs.push({t:t+k*bs+j*beat,acc:j===0,i,mn})}
-    t+=M*bs});
-  return t}
-function click(t,acc){const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=acc?1500:1000;
-  g.gain.setValueAtTime(0.4,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.05);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+0.06)}
-function setBtn(){$('p1').textContent=playing==='1'?'■ 정지':'▶ 메트로놈 재생';$('p2').textContent=playing==='2'?'■ 정지':'▶ 전체 재생 (메트로놈)'}
+    for(let k=0;k<M;k++){mn++;for(let j=0;j<nb;j++)evs.push({t:T+k*bs+j*beat,acc:j===0,i,mn})}T+=M*bs});return T}
+function click(x,acc){const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=acc?1500:1000;
+  g.gain.setValueAtTime(0.4,x);g.gain.exponentialRampToValueAtTime(0.001,x+0.05);o.connect(g);g.connect(AC.destination);o.start(x);o.stop(x+0.06)}
+function setBtn(){$('p1').innerHTML=tf(playing==='1'?'stop':'play',1);$('p2').innerHTML=tf(playing==='2'?'stop':'playAll',1)}
 function stopPlay(){clearInterval(tm);playing=null;setBtn();$('s1').textContent='';$('s2').textContent=''}
 function startPlay(S,tag){stopPlay();if(!S.length)return;
   AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume();
-  const tot=build(S);ei=0;ui=0;t0=AC.currentTime+0.1;playing=tag;setBtn();
+  const tot=build(S);ei=0;ui=0;cur=null;t0=AC.currentTime+0.1;playing=tag;setBtn();
   tm=setInterval(()=>{const now=AC.currentTime;
     while(ei<evs.length&&t0+evs[ei].t<now+0.1){click(t0+evs[ei].t,evs[ei].acc);ei++}
     while(ui<ei&&t0+evs[ui].t<=now){cur=evs[ui];ui++}
-    if(cur)$('s'+tag).textContent='재생 중 · '+(tag==='2'?'구간 '+(cur.i+1)+' · ':'')+'마디 '+cur.mn;
-    if(ei>=evs.length&&now>t0+tot+0.05)stopPlay()},25);cur=null}
+    if(cur)$('s'+tag).textContent=t('playing')+' · '+(tag==='2'?t('secL')+' '+(cur.i+1)+' · ':'')+t('barL')+' '+cur.mn;
+    if(ei>=evs.length&&now>t0+tot+0.05)stopPlay()},25)}
 $('p1').onclick=()=>{if(playing==='1')return stopPlay();
   const n=+$('num').value,d=+$('den').value,u=+$('unit').value,b=+$('bpm').value,m=+$('meas').value;
-  if(!(n>0&&b>0)){$('s1').textContent='박자와 bpm을 확인하세요.';return}
-  startPlay([{n,d,u,b,m:m>0?m:4}],'1')};
-$('p2').onclick=()=>{if(playing==='2')return stopPlay();const S=getSecs();if(!S.length){$('s2').textContent='입력 값을 확인하세요.';return}startPlay(S,'2')};
-document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',stopPlay));
+  if(!(n>0&&b>0)){$('s1').textContent=t('eTB');return}startPlay([{n,d,u,b,m:m>0?m:4}],'1')};
+$('p2').onclick=()=>{if(playing==='2')return stopPlay();const S=getSecs();if(!S.length){$('s2').textContent=t('eChk');return}startPlay(S,'2')};
 
-// ---- 저장 / 불러오기 ----
-const UL={0.5:'2분음표',0.25:'4분음표',0.375:'점4분음표',0.125:'8분음표'};
-const say=t=>{(($('multi').hidden)?$('s1'):$('msg')).textContent=t};
-function getSecs(){return [...rows.children].map(r=>{const q=c=>r.querySelector(c);
-  const o={nm:q('.nm').value.trim(),n:+q('.n').value,d:+q('.d').value,u:+q('.u').value,b:+q('.b').value,m:+q('.m').value};
-  o.sec=o.m*60/o.b*(o.n/o.d/o.u);return o}).filter(o=>o.n>0&&o.b>0&&o.m>=0)}
+// ---- save / load ----
+const say=x=>{(($('multi').hidden)?$('s1'):$('msg')).textContent=x};
+const LS={get(){try{return JSON.parse(localStorage.getItem('lc.p')||'{}')}catch(e){return{}}},set(o){try{localStorage.setItem('lc.p',JSON.stringify(o));return true}catch(e){return false}}};
 function setRows(a){rows.innerHTML='';if(!a.length)addRow();else a.forEach(x=>addRow(x));calcMulti()}
-const LS={get(){try{return JSON.parse(localStorage.getItem('lc.p')||'{}')}catch(e){return{}}},
-  set(o){try{localStorage.setItem('lc.p',JSON.stringify(o));return true}catch(e){return false}}};
 function refreshPl(sel){const o=LS.get(),k=Object.keys(o);
-  $('pl').innerHTML=k.length?k.map(x=>'<option>'+x.replace(/</g,'&lt;')+'</option>').join(''):'<option value="">저장된 작품 없음</option>';
+  $('pl').innerHTML=k.length?k.map(x=>'<option>'+x.replace(/</g,'&lt;')+'</option>').join(''):'<option value="">'+t('noSaved')+'</option>';
   if(sel&&k.includes(sel))$('pl').value=sel}
 $('sv').onclick=()=>{const nm=$('pn').value.trim(),S=getSecs();
-  if(!nm)return say('작품 이름을 입력하세요.');if(!S.length)return say('저장할 구간이 없어요.');
+  if(!nm)return say(t('nName'));if(!S.length)return say(t('nSec0'));
   const o=LS.get();o[nm]=S.map(({nm,n,d,u,b,m})=>({nm,n,d,u,b,m}));
-  say(LS.set(o)?'"'+nm+'" 저장했어요.':'이 환경에서는 저장할 수 없어요. 코드 내보내기를 이용하세요.');refreshPl(nm)};
-$('ld').onclick=()=>{const k=$('pl').value,o=LS.get();if(!k||!o[k])return say('불러올 작품을 선택하세요.');
-  setRows(o[k]);$('pn').value=k;say('"'+k+'" 불러왔어요.')};
-$('rm').onclick=()=>{const k=$('pl').value,o=LS.get();if(!k||!o[k])return;delete o[k];LS.set(o);refreshPl();say('"'+k+'" 삭제했어요.')};
-refreshPl();
+  say(LS.set(o)?'"'+nm+'" '+t('saved'):t('noStore'));refreshPl(nm)};
+$('ld').onclick=()=>{const k=$('pl').value,o=LS.get();if(!k||!o[k])return say(t('pick'));setRows(o[k]);$('pn').value=k;say('"'+k+'" '+t('loaded'))};
+$('rm').onclick=()=>{const k=$('pl').value,o=LS.get();if(!k||!o[k])return;delete o[k];LS.set(o);refreshPl();say('"'+k+'" '+t('deleted'))};
 
-// ---- 공유 ----
-function summary(){const S=getSecs();let t=0,mm=0;const L=['[작품 길이 계산]'];
-  S.forEach((s,i)=>{L.push((s.nm||'구간 '+(i+1))+' | '+s.n+'/'+s.d+' | '+UL[s.u]+'='+s.b+' | '+s.m+'마디 | '+fmt(s.sec));t+=s.sec;mm+=s.m});
-  L.push('총 '+mm+'마디 · '+fmt(t));return L.join('\n')}
-async function copyTxt(t){$('code').value=t;
-  try{await navigator.clipboard.writeText(t);say('복사했어요.')}
-  catch(e){if($('multi').hidden)$('s1').textContent=t;else{$('code').select();say('아래 상자의 내용을 직접 복사하세요.')}}}
-async function shareTxt(t){if(navigator.share){try{await navigator.share({title:'작품 길이 계산',text:t});return}catch(e){if(e&&e.name==='AbortError')return}}copyTxt(t)}
-$('sh1').onclick=()=>{stopPlay();shareTxt('[작품 길이 계산]\n'+$('num').value+'/'+$('den').value+' | '+UL[+$('unit').value]+'='+(+(+$('bpm').value).toFixed(1))+' | '+(+(+$('meas').value).toFixed(2))+'마디 | '+$('time').value)};
+// ---- share ----
+function summary(){const S=getSecs();let T=0,M=0;const L=[t('hdr')];
+  S.forEach((s,i)=>{L.push((s.nm||t('secL')+' '+(i+1))+' | '+s.n+'/'+s.d+' | '+t(UN[s.u])+'='+s.b+' | '+s.m+' '+t('ms')+' | '+fmt(s.sec));T+=s.sec;M+=s.m});
+  L.push(t('tot')+': '+M+' '+t('ms')+' · '+fmt(T));return L.join('\n')}
+async function copyTxt(x){$('code').value=x;
+  try{await navigator.clipboard.writeText(x);say(t('copied'))}
+  catch(e){if($('multi').hidden)$('s1').textContent=x;else{$('code').select();say(t('manual'))}}}
+async function shareTxt(x){if(navigator.share){try{await navigator.share({title:t('title'),text:x});return}catch(e){if(e&&e.name==='AbortError')return}}copyTxt(x)}
+$('sh1').onclick=()=>{stopPlay();shareTxt(t('hdr')+'\n'+$('num').value+'/'+$('den').value+' | '+t(UN[+$('unit').value])+'='+(+(+$('bpm').value).toFixed(1))+' | '+(+(+$('meas').value).toFixed(2))+' '+t('ms')+' | '+$('time').value)};
 $('sh2').onclick=()=>shareTxt(summary());
-$('ex').onclick=()=>{const S=getSecs().map(({nm,n,d,u,b,m})=>({nm,n,d,u,b,m}));copyTxt(JSON.stringify(S))};
+$('ex').onclick=()=>copyTxt(JSON.stringify(getSecs().map(({nm,n,d,u,b,m})=>({nm,n,d,u,b,m}))));
 $('im').onclick=()=>{try{const a=JSON.parse($('code').value);
   if(!Array.isArray(a)||!a.length||!a.every(x=>x&&x.n>0&&x.d>0&&x.u>0&&x.b>0&&x.m>=0))throw 0;
-  setRows(a.map(({nm,n,d,u,b,m})=>({nm:String(nm||''),n:+n,d:+d,u:+u,b:+b,m:+m})));say('가져왔어요.')}catch(e){say('코드를 확인하세요.')}};
+  setRows(a.map(({nm,n,d,u,b,m})=>({nm:String(nm||''),n:+n,d:+d,u:+u,b:+b,m:+m})));say(t('imported'))}catch(e){say(t('badCode'))}};
 
-// ---- 탭 템포 ----
-function makeTapper(btn,fn){let T=[],to=null;const lbl=btn.textContent;
-  btn.addEventListener('pointerdown',e=>{e.preventDefault();const now=performance.now();
-    if(T.length&&now-T[T.length-1]>2500)T=[];T.push(now);if(T.length>8)T.shift();
-    clearTimeout(to);to=setTimeout(()=>{T=[];btn.textContent=lbl},2500);
-    if(T.length<2){btn.textContent='계속 탭…';return}
-    const b=Math.round(60000*(T.length-1)/(T[T.length-1]-T[0]));
-    btn.textContent=b+' bpm';fn(b)})}
-makeTapper($('tap1'),b=>{
-  if(mode==='bpm')document.querySelector('#modes button[data-m="time"]').click();
-  $('bpm').value=b;calc()});
+// ---- language ----
+function refresh(){document.documentElement.lang=lang==='ko'?'ko':'en';document.title=t('title');
+  document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+  applyLang();calc();calcMulti();setBtn();refreshPl($('pl').value)}
+document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>{lang=b.dataset.l;try{localStorage.setItem('lc.lang',lang)}catch(e){}refresh()});
+addRow();addRow();refresh();
 </script>
 </body>
 </html>
