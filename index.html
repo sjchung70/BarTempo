@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>MusiCalculator</title>
+<title>BarTempo</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2f5d8a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Musicalc">
+<meta name="apple-mobile-web-app-title" content="BarTempo">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="icon" href="icon-192.png?v=2">
@@ -89,11 +89,11 @@ small{font-size:11px;font-weight:400;opacity:.85}
 <script>
 const $=id=>document.getElementById(id);
 const D={
-title:['음악 계산기','MusiCalculator'],tag:['연주 시간, 마디 수, 빠르기','Duration, Measures, Tempo'],tabS:['단일 구간','Single section'],tabM:['다구간 (템포·박자 변화)','Multi-section (tempo / meter changes)'],
-lCalc:['계산할 값','Calculate'],mT:['시간','Duration'],mM:['마디 수','Measures'],mB:['빠르기 (bpm)','Tempo (bpm)'],
+title:['음악 계산기','BarTempo'],tag:['마디 수, 빠르기, 연주 시간','Bars, Tempo, & Duration'],tabS:['단일 구간','Single section'],tabM:['다구간 (템포·박자 변화)','Multi-section (tempo / meter changes)'],
+lCalc:['계산할 값','Calculate'],mT:['시간','Duration'],mM:['마디 수','Bars'],mB:['빠르기 (bpm)','Tempo (bpm)'],
 subS:['구하고 싶은 값을 고르고, 나머지 값을 입력하세요.','Choose what to find, then fill in the other values.'],
-subM:['구간마다 박자·빠르기·마디 수를 입력하면 전체 길이를 합산합니다.','Enter time signature, tempo and measures for each section to get the total length.'],
-lTs:['박자 (분자/분모)','Time signature'],lUnit:['bpm 기준 음표','Beat unit'],lBpm:['빠르기 (bpm)','Tempo (bpm)'],lMeas:['마디 수','Measures'],lTime:['연주 시간 (분:초 또는 초)','Duration (mm:ss or sec)'],
+subM:['구간마다 박자·빠르기·마디 수를 입력하면 전체 길이를 합산합니다.','Enter time signature, tempo and bars for each section to get the total length.'],
+lTs:['박자 (분자/분모)','Time signature'],lUnit:['bpm 기준 음표','Beat unit'],lBpm:['빠르기 (bpm)','Tempo (bpm)'],lMeas:['마디 수','Bars'],lTime:['연주 시간 (분:초 또는 초)','Duration (mm:ss or sec)'],
 u2:['2분음표','Half note'],u4:['4분음표','Quarter note'],u4d:['점4분음표','Dotted quarter'],u8:['8분음표','Eighth note'],
 tap:['탭 템포','Tap tempo'],tapping:['탭…','Tap…'],play:['▶ 메트로놈 재생','▶ Play metronome'],playAll:['▶ 전체 재생 (메트로놈)','▶ Play all with metronome'],stop:['■ 정지','■ Stop'],
 share:['결과 공유','Share result'],add:['+ 구간 추가','+ Add section'],lTarget:['목표 시간 (선택)','Target duration (optional)'],
@@ -102,16 +102,16 @@ lShare:['공유','Share'],exp:['코드 내보내기','Export code'],imp:['코드
 secName:['구간 이름 (선택)','Section name (optional)'],pTitle:['작품 이름','Piece title'],pTarget:['예: 3:30','e.g. 3:30'],
 pCode:['내보낸 코드가 여기에 표시됩니다. 다른 기기에서는 붙여넣고 "코드 가져오기"를 누르세요.','Exported code appears here. On another device, paste it and press "Import code".'],
 noSaved:['저장된 작품 없음','No saved pieces'],
-rDur:['연주 시간','Duration'],rBar:['한 마디','One measure'],s:['초','s'],ms:['마디','measures'],rNeed:['필요한 마디 수','Measures needed'],
+rDur:['연주 시간','Duration'],rBar:['한 마디','One bar'],s:['초','s'],ms:['마디','bars'],rNeed:['필요한 마디 수','Bars needed'],
 exact:['정확히 떨어집니다.','Fits exactly.'],up:['올림','Round up'],down:['내림','Round down'],rTempo:['필요한 빠르기','Required tempo'],
-eTs:['박자를 확인하세요.','Check the time signature.'],eBM:['빠르기(bpm)와 마디 수를 입력하세요.','Enter tempo (bpm) and measures.'],eBT:['빠르기(bpm)와 시간을 입력하세요.','Enter tempo (bpm) and duration.'],
-eMT:['마디 수와 시간을 입력하세요.','Enter measures and duration.'],eChk:['입력 값을 확인하세요.','Check the input values.'],eVal:['값을 확인하세요','Check values'],
+eTs:['박자를 확인하세요.','Check the time signature.'],eBM:['빠르기(bpm)와 마디 수를 입력하세요.','Enter tempo (bpm) and bars.'],eBT:['빠르기(bpm)와 시간을 입력하세요.','Enter tempo (bpm) and duration.'],
+eMT:['마디 수와 시간을 입력하세요.','Enter bars and duration.'],eChk:['입력 값을 확인하세요.','Check the input values.'],eVal:['값을 확인하세요','Check values'],
 len:['길이','Length'],start:['시작','Start'],bars:['마디','Bars'],tot:['총 길이','Total'],nSec:['구간','sections'],targ:['목표','Target'],over:['김','over'],under:['짧음','under'],match:['거의 일치','Match'],
 playing:['재생 중','Playing'],secL:['구간','Section'],barL:['마디','Bar'],eTB:['박자와 빠르기(bpm)를 확인하세요.','Check time signature and tempo (bpm).'],
 nName:['작품 이름을 입력하세요.','Enter a piece title.'],nSec0:['저장할 구간이 없어요.','No sections to save.'],saved:['저장했어요.','Saved.'],
 noStore:['이 환경에서는 저장할 수 없어요. 코드 내보내기를 이용하세요.','Storage is unavailable here. Use Export code.'],pick:['불러올 작품을 선택하세요.','Select a piece to load.'],
 loaded:['불러왔어요.','Loaded.'],deleted:['삭제했어요.','Deleted.'],copied:['복사했어요.','Copied.'],manual:['아래 상자의 내용을 직접 복사하세요.','Copy the text in the box below.'],
-imported:['가져왔어요.','Imported.'],badCode:['코드를 확인하세요.','Check the code.'],hdr:['[음악 계산기]','[MusiCalculator]']};
+imported:['가져왔어요.','Imported.'],badCode:['코드를 확인하세요.','Check the code.'],hdr:['[음악 계산기]','[BarTempo]']};
 const UK=[[0.5,'u2'],[0.25,'u4'],[0.375,'u4d'],[0.125,'u8']],UN={0.5:'u2',0.25:'u4',0.375:'u4d',0.125:'u8'};
 let lang='en',mode='time';try{lang=localStorage.getItem('lc.lang')||'en'}catch(e){}
 const t=k=>{const d=D[k];return lang==='ko'?d[0]:lang==='en'?d[1]:d[0]+' / '+d[1]};
