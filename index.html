@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Duration Calculator</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2f5d8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Duration">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
 <style>
 :root{--bg:#f6f5f1;--card:#fff;--tx:#1d1d1b;--mut:#6b6a66;--ac:#2f5d8a;--acbg:#e6eef6;--bd:#d9d7d0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1a19;--card:#242422;--tx:#eeede8;--mut:#a09f99;--ac:#8fb8e3;--acbg:#26364a;--bd:#3a3a37}}
@@ -247,6 +255,7 @@ function refresh(){document.documentElement.lang=lang==='ko'?'ko':'en';document.
   applyLang();calc();calcMulti();setBtn();refreshPl($('pl').value)}
 document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>{lang=b.dataset.l;try{localStorage.setItem('lc.lang',lang)}catch(e){}refresh()});
 addRow();addRow();refresh();
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){window.addEventListener('load',()=>{try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}})}
 </script>
 </body>
 </html>
